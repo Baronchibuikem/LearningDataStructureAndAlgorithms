@@ -112,10 +112,32 @@ def find_index(items: list, summed: int) -> list[int]:
 
         continue
 
-    # brute force
+
+def find_index2(items: list, summed: int) -> list(int):
+
+    sorted_items = sorted(items)
+    left, right = 0, len(sorted_items) - 1
+
+    while right > left:
+        mid_point = (left + right) // 2
+        print(mid_point)
+
+        if sorted_items[mid_point] + sorted_items[mid_point - 1] > summed:
+            return [
+                sorted_items.index(sorted_items[mid_point]),
+                sorted_items.index(sorted_items[mid_point + -1]),
+            ]
+        else:
+            left -= 1
 
 
 # for test in test_data:
 #     result = find_index(**test["inputs"])
 #     print("<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>")
 #     print(result == test["output"])
+
+
+"""
+    Question
+    Given two sorted arrays nums1 and nums2 of size m and n respectively, return the median of the two sorted arrays.
+"""
