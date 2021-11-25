@@ -3,13 +3,14 @@ Question:
 Implement a binary tree using Python, and show it's usuage with some example
 """
 
-# Binary tree
+
 class TreeNode:
-    def __init__(self, key=None, value=None) -> None:
+    def __init__(self, key=None, value=None, root=None) -> None:
         self.key = key
         self.left = None
         self.right = None
         self.value = value
+        self.root = root
 
     # convert the tuple arguments to a binary tree automatically
     def parse_tuple(self, data):
@@ -75,7 +76,10 @@ class TreeNode:
     def tree_height_or_max_depth(self, node: list) -> int:
         if node is None:
             return 0
-        return 1 + max(self.tree_height(node.left), self.tree_height(node.right))
+        return 1 + max(
+            self.tree_height_or_max_depth(node.left),
+            self.tree_height_or_max_depth(node.right),
+        )
 
     # get the size of the tree
     def tree_size(self, node: list) -> int:
@@ -126,6 +130,89 @@ class TreeNode:
 
         return node
 
+    def find(self, node, key):
+        if node is None:
+            return None
+
+        if key == node.key:
+            return node
+
+        if key < node.key:
+            return self.find(node.left, key)
+        if key > node.key:
+            return self.find(node.right, key)
+
+    def update(self, node, key, value):
+        target = self.find(node, key)
+
+        if target is not None:
+            target.value = value
+
+    def list_all(self, node):
+        if node is None:
+            return []
+
+        return (
+            self.list_all(node.left)
+            + [(node.key, node.value)]
+            + self.list_all(node.right)
+        )
+
+    def is_balanced(self, node):
+        if node is None:
+            return True, 0
+
+        balanced_left, height_left = self.is_balanced(node.left)
+        balanced_right, height_right = self.is_balanced(node.right)
+        balanced = (
+            balanced_left and balanced_right and abs(height_left - height_right) <= 1
+        )
+        height = 1 + max(height_left, height_right)
+        return balanced, height
+
+    def make_balance_bst(self, data, low=0, high=None, parent=None):
+        data = sorted(data)
+        if len(data) == 0:
+            return None
+
+        if high is None:
+            high = len(data) - 1
+
+        if low > high:
+            return None
+
+        mid = high + low // 2
+        key, value = data[mid]
+
+        root = self(key, value)
+        root.parent = parent
+        root.left = self.make_balance_bst(data, low, mid - 1, root)
+        root.right = self.make_balance_bst(data, mid + 1, high, root)
+        return root
+
+    def balance_an_unbalance_bst(self, node):
+        return self.make_balance_bst(self.list_all(node))
+
+    def __setitem__(self, key, value):
+        # check if the key already exist
+        node = self.find(self.root, key)
+
+        if not node:
+            self.root = self.insert(self.root, key, value)
+            self.root = self.make_balance_bst(self.root)
+        else:
+            self.update(self.root, key, value)
+
+    def __getitem__(self, key):
+        node = self.find(self.root, key)
+        return node.value if node else None
+
+    def __iter__(self):
+        return (x for x in self.list_all(self.root))
+
+    def __len__(self):
+        return self.tree_size(self.root)
+
 
 # Create tree automatically
 # first tuple is the left node
@@ -146,7 +233,7 @@ root.right.right.left = TreeNode(6)
 root.right.right.right = TreeNode(8)
 
 
-tree = root.parse_tuple(tree_tuple)
+tree1 = root.parse_tuple(tree_tuple)
 
 # A binary search tree is a binary tree that satisfies the following conditions
 # 1 - The left subtree of any node only contains nodes with keys less than the node's key
@@ -164,4 +251,21 @@ tree.insert(value, "baron", "baron")
 tree.insert(value, "favour", "favour")
 tree.insert(value, "ochez", "ochez")
 
-tree.display_keys(value)
+# tree.display_keys(value)
+# find_value = tree.is_balanced(value)
+# height = tree.tree_height_or_max_depth(value)
+# print(find_value)
+# print(height)
+
+# creating a new tree
+tree3 = (
+    ("aakash", "birah", "hemanth"),
+    "jadesh",
+    (("siddhant"), "sonaksh", (None, "tanya", "vishal")),
+)
+root = TreeNode()
+create_tree = root.parse_tuple(tree3)
+
+root.display_keys(create_tree)
+balanced = root.is_balanced(create_tree)
+print(balanced)

@@ -141,3 +141,5 @@ def find_index2(items: list, summed: int) -> list(int):
     Question
     Given two sorted arrays nums1 and nums2 of size m and n respectively, return the median of the two sorted arrays.
 """
+
+"""Write a function to create a balanced BST from a sorted list/array of key-value pairs"""
